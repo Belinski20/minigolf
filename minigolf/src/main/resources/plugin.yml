@@ -1,0 +1,29 @@
+name: Minigolf
+version: '${project.version}'
+main: spinalcraft.minigolf.Minigolf
+api-version: 1.20
+authors: [Belinski20]
+description: Minigolf
+depend: [Vault]
+
+commands:
+  tpb:
+    permission-message: Do not have valid permissions to use
+    usage: equip items
+    description: Updates a specific players slip rank
+    permission: minigolf.tpb
+  start:
+    permission-message: Do not have valid permissions to use
+    usage: /start <Course Name>
+    description: Starts minigolf for a specified course
+    permission: minigolf.start
+  party:
+    permission-message: Do not have valid permissions to use
+    usage: /party
+    description: Makes a party for golf
+    permission: minigolf.party
+  cc:
+    permission-message: Do not have valid permissions to use
+    usage: /cc
+    description: Used to create and edit courses
+    permission: minigolf.cc
