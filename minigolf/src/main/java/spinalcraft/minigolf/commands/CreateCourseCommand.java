@@ -32,7 +32,7 @@ public class CreateCourseCommand implements TabExecutor {
 
         if(args.length == 2 && args[0].equals("new"))
         {
-            CourseCreation cc = new CourseCreation(args[0]);
+            CourseCreation cc = new CourseCreation(args[1]);
             Minigolf.courseManager.addCourseCreation(p, cc);
             cc.openCourseInv(p);
             return true;
@@ -78,9 +78,9 @@ public class CreateCourseCommand implements TabExecutor {
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(args.length == 1)
             return Arrays.asList("new", "save", "edit", "quit");
-        if(args.length == 2 && args[0] == "new")
+        if(args.length == 2 && args[0].equals("new"))
             return Arrays.asList("<Course Name>");
-        if(args.length == 2 && args[0] == "edit")
+        if(args.length == 2 && args[0].equals("edit"))
             return Minigolf.courseManager.getCourses();
         return null;
     }

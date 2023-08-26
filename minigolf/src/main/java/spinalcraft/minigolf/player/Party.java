@@ -55,6 +55,30 @@ public class Party {
             scoreCard.openGUI(p);
     }
 
+    public boolean isDoneWithHole()
+    {
+        boolean isDoneWithHole = true;
+        for(Player p : players)
+        {
+            if(!Minigolf.playerManager.getGolfer(p).getCourse().getHoleByNumber(currentCourse).isComplete())
+                isDoneWithHole = false;
+        }
+        return isDoneWithHole;
+    }
+
+    public void incrementHole()
+    {
+        currentCourse += 1;
+    }
+
+    public void teleportToNextHole()
+    {
+        for(Player p : players)
+        {
+            p.teleport(Minigolf.playerManager.getGolfer(p).getCourse().getHoleByNumber(currentCourse).getLoc());
+        }
+    }
+
     public ScoreCard getScoreCard()
     {
         return scoreCard;

@@ -71,4 +71,14 @@ public class Hole {
         complete = true;
     }
 
+    public void setPar(int par)
+    {
+        this.par = par;
+    }
+
+    public void setLoc(Location loc)
+    {
+        this.loc = loc;
+    }
+
 }

@@ -22,11 +22,11 @@ public class StartGolfCommand implements TabExecutor {
         if (!(sender instanceof Player))
             return true;
 
-        //if(args.length == 0)
-        //    return true;
+        if(args.length == 0)
+            return true;
 
-        //if(!Minigolf.courseManager.isCourse(args[0]))
-        //    return true;
+        if(!Minigolf.courseManager.isCourse(args[0]))
+            return true;
 
         Player p = (Player)sender;
 
@@ -35,19 +35,21 @@ public class StartGolfCommand implements TabExecutor {
             Party party = Minigolf.playerManager.getPlayersParty(p);
             if(party == null)
                 party = Minigolf.playerManager.createParty(p);
-        //    Course course = Minigolf.fUtils.loadCourseFile(args[0]);
+            Course course = Minigolf.fUtils.loadCourseFile(args[0]);
 
             for(Player golfer : party.getPlayers())
             {
                 Minigolf.fUtils.createPlayerFile(golfer);
                 Golfer g = Minigolf.fUtils.loadPlayerFile(golfer, null);
-                g.devCreateCourses();
+                //g.devCreateCourses();
                 Minigolf.playerManager.addGolfer(golfer, g);
                 party.initliazeScoreCard();
+                party.teleportToNextHole();
                 //Jank Code
                 g.getBall().setOwner(g);
-                Item item = p.getWorld().dropItem(p.getLocation(), g.getBall().getBallSkin());
+                Item item = p.getWorld().dropItem(g.getCourse().getHoleByNumber(party.getCurrentCourse()).getLoc(), g.getBall().getBallSkin());
                 item.setCanPlayerPickup(false);
+                item.setUnlimitedLifetime(true);
                 g.getBall().setBall(item);
             }
 

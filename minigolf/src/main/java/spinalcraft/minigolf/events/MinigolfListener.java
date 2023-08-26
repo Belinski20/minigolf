@@ -108,6 +108,26 @@ public class MinigolfListener implements Listener {
             if(Minigolf.courseManager.getCourseEvent(p) instanceof ParHoleEvent)
             {
                 ParHoleEvent parHoleEvent = (ParHoleEvent) e;
+                int par = 0;
+                try{
+                    par = Integer.valueOf(((TextComponent)event.message()).content());
+                    parHoleEvent.getHole().setPar(par);
+                    //successfully converted string to int
+                }
+                catch(NumberFormatException err)
+                {
+                    //failed to convert number
+                }
+                Minigolf.courseManager.removeCourseEvent(p);
+                new BukkitRunnable() {
+                    @Override
+                    public void run(){
+                        Minigolf.courseManager.getCourseCreation(p).openHoleInv(p, parHoleEvent.getHole());
+                        this.cancel();
+                    }
+                }.runTaskTimer(Minigolf.m, 0, 1);
+
+                return;
             }
         }
     }
@@ -118,12 +138,25 @@ public class MinigolfListener implements Listener {
         Player p = event.getPlayer();
         if(Minigolf.courseManager.hasCourseEvent(p))
         {
+            if(!event.getBlock().getType().equals(Material.WHITE_CANDLE))
+                return;
+
             Event e = Minigolf.courseManager.getCourseEvent(p);
             if(e instanceof TeeHoleEvent)
             {
                 TeeHoleEvent teeHoleEvent = (TeeHoleEvent) e;
+                teeHoleEvent.getHole().setLoc(event.getBlock().getLocation());
+                event.getBlock().setType(Material.AIR);
+                Minigolf.courseManager.getCourseCreation(p).openHoleInv(p, teeHoleEvent.getHole());
             }
         }
+    }
+
+    @EventHandler
+    public void teeClickEvent(TeeHoleEvent event)
+    {
+        event.getPlayer().getInventory().addItem(new ItemStack(Material.WHITE_CANDLE, 1));
+        Minigolf.courseManager.addCourseEvent(event.getPlayer(), event);
     }
 
     @EventHandler
@@ -146,10 +179,24 @@ public class MinigolfListener implements Listener {
     }
 
     @EventHandler
+    public void parHoleEvent(ParHoleEvent event)
+    {
+        Minigolf.courseManager.addCourseEvent(event.getPlayer(), event);
+    }
+
+    @EventHandler
     public void editHole(EditHoleEvent event)
     {
         CourseCreation c = Minigolf.courseManager.getCourseCreation(event.getPlayer());
         c.openHoleInv(event.getPlayer(), c.getHole(PlainTextComponentSerializer.plainText().serialize(event.getitemStack().getItemMeta().displayName())));
+    }
+
+    @EventHandler
+    public void saveHole(SaveHoleEvent event)
+    {
+        CourseCreation c = Minigolf.courseManager.getCourseCreation(event.getPlayer());
+        c.saveHole(event.getHole());
+        c.openCourseInv(event.getPlayer());
     }
 
 }

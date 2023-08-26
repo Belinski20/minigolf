@@ -1,16 +1,17 @@
 package spinalcraft.minigolf.golf;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class Course {
 
     private String name;
-    private LinkedList<Hole> holes;
+    private ArrayList<Hole> holes;
 
     public Course(String name)
     {
         this.name = name;
-        holes = new LinkedList<>();
+        holes = new ArrayList<>();
     }
 
     public Hole getHoleByNumber(int i)
@@ -46,7 +47,7 @@ public class Course {
         holes.add(hole);
     }
 
-    public LinkedList<Hole> getHoles()
+    public ArrayList<Hole> getHoles()
     {
         return holes;
     }

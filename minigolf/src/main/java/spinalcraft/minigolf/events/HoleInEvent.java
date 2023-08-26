@@ -27,6 +27,12 @@ public class HoleInEvent extends Event {
         golfer.getCourse().getHoleByNumber(party.getCurrentCourse()).setComplete();
         golfer.getBall().getBall().remove();
         golfer.getBall().setBall(null);
+
+        if(party.isDoneWithHole())
+        {
+            party.incrementHole();
+            party.teleportToNextHole();
+        }
     }
 
     public Player getPlayer()

@@ -1,6 +1,7 @@
 package spinalcraft.minigolf.golf;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -28,7 +29,7 @@ public class CourseCreation implements Listener {
     private Map<String, Hole> holes;
     private Inventory courseInv;
     private Inventory holeInv;
-    private ItemStack currentHoleItem;
+    private Hole currentHole;
 
 
     public CourseCreation(String name)
@@ -74,9 +75,12 @@ public class CourseCreation implements Listener {
         Course course = new Course(name);
         for(ItemStack item : courseInv.getStorageContents())
         {
-            if(item.getType().equals(Material.GREEN_CONCRETE))
+            if(item == null || item.getType().equals(Material.AIR))
                 continue;
-            course.addHole(holes.get(item.displayName()));
+            if(item.getType().equals(Material.LIME_CONCRETE))
+                continue;
+            String name = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName());
+            course.addHole(holes.get(getHole(name)));
         }
         Minigolf.courseManager.addCourse(name);
         Minigolf.fUtils.createCourseFile(course);
@@ -93,6 +97,7 @@ public class CourseCreation implements Listener {
         for(Hole h : holes.values())
         {
             courseInv.setItem(index, makeHoleItem(h));
+            index++;
         }
     }
 
@@ -159,6 +164,11 @@ public class CourseCreation implements Listener {
         holeInv.setItem(4, quit);
     }
 
+    public void removeHole(Hole hole)
+    {
+        holes.remove(hole.getName());
+    }
+
     public Hole getHole(String name)
     {
         return holes.get(name);
@@ -186,10 +196,13 @@ public class CourseCreation implements Listener {
             switch(item.getType())
             {
                 case LIME_CONCRETE:
+                    if(holes.size() >= 9)
+                        return;
                     Bukkit.getServer().getPluginManager().callEvent(new AddHoleEvent(courseInv, e.getWhoClicked()));
                     break;
                 case MOSS_BLOCK:
                     courseInv.close();
+                    currentHole = getHole(PlainTextComponentSerializer.plainText().serialize(e.getCurrentItem().getItemMeta().displayName()));
                     Bukkit.getServer().getPluginManager().callEvent(new EditHoleEvent(e.getWhoClicked(), e.getCurrentItem()));
                     break;
             }
@@ -210,33 +223,35 @@ public class CourseCreation implements Listener {
             return;
         }
 
-        if(e.getInventory().equals(courseInv))
+        if(e.getInventory().equals(holeInv))
         {
-            ItemStack item = courseInv.getItem(e.getSlot());
+            ItemStack item = holeInv.getItem(e.getSlot());
 
             if(item == null)
                 return;
+
+            Hole hole = currentHole;
 
             switch(item.getType())
             {
                 // undo editing hole
                 case RED_CONCRETE:
-                    Bukkit.getServer().getPluginManager().callEvent(new AddHoleEvent(courseInv, e.getWhoClicked()));
+                    Bukkit.getServer().getPluginManager().callEvent(new UndoHoleEvent(hole, this));
                     holeInv.close();
                     break;
                 // par
                 case SNOWBALL:
-                    Bukkit.getServer().getPluginManager().callEvent(new ParHoleEvent());
+                    Bukkit.getServer().getPluginManager().callEvent(new ParHoleEvent(hole, (Player)e.getWhoClicked()));
                     holeInv.close();
                     break;
                 // place tee
                 case WHITE_CANDLE:
-                    Bukkit.getServer().getPluginManager().callEvent(new TeeHoleEvent());
+                    Bukkit.getServer().getPluginManager().callEvent(new TeeHoleEvent((Player)e.getWhoClicked(), hole));
                     holeInv.close();
                     break;
                 // save hole
-                case GREEN_CONCRETE:
-                    Bukkit.getServer().getPluginManager().callEvent(new SaveHoleEvent());
+                case LIME_CONCRETE:
+                    Bukkit.getServer().getPluginManager().callEvent(new SaveHoleEvent((Player)e.getWhoClicked(), hole));
                     holeInv.close();
                     break;
             }
@@ -252,7 +267,4 @@ public class CourseCreation implements Listener {
             e.setCancelled(true);
         }
     }
-
-
-
 }

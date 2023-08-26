@@ -144,6 +144,9 @@ public class FileUtils {
         FileConfiguration config;
         File file = new File(courseFileLocation, c.getName() + ".yml");
         try {
+            if(file.exists())
+                file.delete();
+
             if(file.createNewFile())
             {
                 config = YamlConfiguration.loadConfiguration(file);
