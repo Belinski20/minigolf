@@ -1,13 +1,10 @@
 package spinalcraft.minigolf.player;
 
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import spinalcraft.minigolf.Minigolf;
 import spinalcraft.minigolf.golf.Course;
 import spinalcraft.minigolf.golf.CourseCreation;
-import spinalcraft.minigolf.golf.Hole;
 
 import java.util.*;
 
@@ -25,7 +22,13 @@ public class CourseManager {
         coursesInCreations = new HashMap<>();
         greens = new LinkedList<>();
         Minigolf.fUtils.createConfigFile();
-        greens = Minigolf.fUtils.loadConfigFile();
+        greens = Minigolf.fUtils.loadConfigFileForGreens();
+        loadCourses();
+    }
+
+    public void loadCourses()
+    {
+        courses.addAll(Minigolf.fUtils.getCourseNames());
     }
 
     public boolean isCreatingCourse(Player p)
@@ -72,9 +75,13 @@ public class CourseManager {
         return greens;
     }
 
-    public void addGreen(Material green)
+    public void addGreen(String green)
     {
-        greens.add(green.toString());
+        greens.add(green);
+    }
+    public void removeGreen(String green)
+    {
+        greens.remove(green);
     }
 
     public void addCourse(String course)
@@ -122,12 +129,4 @@ public class CourseManager {
         }
         return false;
     }
-
-    public boolean setHoleTee(Course c, Location loc, int par, String name)
-    {
-        Hole hole = new Hole(name, par, loc);
-        c.addHole(hole);
-        return true;
-    }
-
 }

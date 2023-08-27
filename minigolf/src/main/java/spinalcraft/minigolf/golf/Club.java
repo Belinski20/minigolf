@@ -16,5 +16,9 @@ public class Club {
     {
         return clubSkin;
     }
+    public void setClubSkin(ItemStack clubSkin)
+    {
+        this.clubSkin = clubSkin;
+    }
 
 }

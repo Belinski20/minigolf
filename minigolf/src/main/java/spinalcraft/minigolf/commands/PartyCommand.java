@@ -24,7 +24,12 @@ public class PartyCommand implements TabExecutor {
 
         if(Minigolf.playerManager.isPlayerGolfing(p))
         {
-            p.sendMessage(Messages.makeMessage(Messages.PartyDuringGolf));
+            if(args.length == 1 && args[0].equals("leave"))
+            {
+                leave(p);
+            }
+            else
+                p.sendMessage(Messages.makeMessage(Messages.PartyDuringGolf));
             return true;
         }
 
@@ -115,6 +120,8 @@ public class PartyCommand implements TabExecutor {
         invitee.sendMessage(Messages.makeMessage(Messages.PartyInviteInvited.replace("PLAYER", sender.getName())));
         sender.sendMessage(Messages.makeMessage(Messages.PartyInviteSent.replace("PLAYER", invitee.getName())));
 
+        Minigolf.playerManager.addPendingPartyInvite(invitee, Minigolf.playerManager.getPlayersParty(sender));
+
         new BukkitRunnable()
         {
 
@@ -155,6 +162,8 @@ public class PartyCommand implements TabExecutor {
             return;
         p.sendMessage(Messages.makeMessage(Messages.PartyLeave));
         party.leaveParty(p);
+        if(party == null)
+            return;
         for(Player partyMember : party.getPlayers())
             partyMember.sendMessage(Messages.makeMessage(Messages.PartyLeaveNotice.replace("PLAYER", p.getName())));
     }

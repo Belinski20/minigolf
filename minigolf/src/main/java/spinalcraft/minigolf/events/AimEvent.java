@@ -41,8 +41,13 @@ public class AimEvent extends Event implements Cancellable {
                 if(isCancelled)
                     this.cancel();
 
+                if(Minigolf.playerManager.getGolfer(p) == null)
+                    this.cancel();
+
+
                 if(!gp.getIsCharging())
                     this.cancel();
+
 
 
                 Vector dir = gp.getDirection(p);

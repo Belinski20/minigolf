@@ -1,5 +1,6 @@
 package spinalcraft.minigolf.events;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -12,6 +13,7 @@ public class HoleInEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private Player p;
+    private Location location;
 
     public static HandlerList getHandlerList() {
         return HANDLERS;
@@ -23,16 +25,16 @@ public class HoleInEvent extends Event {
         Golfer golfer = Minigolf.playerManager.getGolfer(p);
         Party party = Minigolf.playerManager.getPlayersParty(p);
 
-        party.getScoreCard().updateScoreCard(party);
+        party.getScoreCard().createScoreCard(party);
         golfer.getCourse().getHoleByNumber(party.getCurrentCourse()).setComplete();
+        location = golfer.getBall().getLocation().clone();
         golfer.getBall().getBall().remove();
         golfer.getBall().setBall(null);
+    }
 
-        if(party.isDoneWithHole())
-        {
-            party.incrementHole();
-            party.teleportToNextHole();
-        }
+    public Location getLocation()
+    {
+        return location;
     }
 
     public Player getPlayer()

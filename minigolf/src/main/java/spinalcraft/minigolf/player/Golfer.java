@@ -2,12 +2,12 @@ package spinalcraft.minigolf.player;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import spinalcraft.minigolf.golf.Ball;
 import spinalcraft.minigolf.golf.Club;
 import spinalcraft.minigolf.golf.Course;
-import spinalcraft.minigolf.golf.Hole;
 
 public class Golfer {
 
@@ -75,28 +75,18 @@ public class Golfer {
             ball.getBall().remove();
     }
 
-
-    public void devCreateCourses()
+    public void giveGolferClub(Player player)
     {
-        course = new Course("Test");
-        Hole hole1 = new Hole("Hole 1", 5, null);
-        Hole hole2 = new Hole("Hole 2", 5, null);
-        Hole hole3 = new Hole("Hole 3", 5, null);
-        Hole hole4 = new Hole("Hole 4", 5, null);
-        Hole hole5 = new Hole("Hole 5", 5, null);
-        Hole hole6 = new Hole("Hole 6", 5, null);
-        Hole hole7 = new Hole("Hole 7", 5, null);
-        Hole hole8 = new Hole("Hole 8", 5, null);
-        course.addHole(hole1);
-        course.addHole(hole2);
-        course.addHole(hole3);
-        course.addHole(hole4);
-        course.addHole(hole5);
-        course.addHole(hole6);
-        course.addHole(hole7);
-        course.addHole(hole8);
-
+        player.getInventory().addItem(getClub().getClubSkin());
     }
 
-
+    public void placeBall(Party p, int currentCourse)
+    {
+        ball.setOwner(this);
+        Item b = p.getWorld().dropItem(getCourse().getHoleByNumber(currentCourse).getLoc().add(0.5, 0.5, 0.5), ball.getBallSkin());
+        b.setVelocity(new Vector(0,0,0));
+        b.setCanPlayerPickup(false);
+        b.setUnlimitedLifetime(true);
+        ball.setBall(b);
+    }
 }

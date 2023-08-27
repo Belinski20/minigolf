@@ -13,8 +13,8 @@ import spinalcraft.minigolf.player.Golfer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class FileUtils {
 
@@ -75,7 +75,7 @@ public class FileUtils {
         }
     }
 
-    public void saveConfigFile(){
+    public void saveConfigFileForGreens(){
         FileConfiguration config;
         File file = new File(plugin.getDataFolder(), "config.yml");
         if(file.exists())
@@ -90,7 +90,23 @@ public class FileUtils {
         }
     }
 
-    public List<String> loadConfigFile(){
+    public void saveConfigFileForLobby(Location loc){
+        FileConfiguration config;
+        File file = new File(plugin.getDataFolder(), "config.yml");
+        if(file.exists())
+        {
+            config = YamlConfiguration.loadConfiguration(file);
+            config.set("Lobby", loc);
+            try {
+                config.save(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
+    public List<String> loadConfigFileForGreens(){
         FileConfiguration config;
         File file = new File(plugin.getDataFolder(), "config.yml");
         config = YamlConfiguration.loadConfiguration(file);
@@ -101,14 +117,25 @@ public class FileUtils {
         return Arrays.asList(Material.GREEN_CONCRETE_POWDER.toString(), Material.GREEN_CONCRETE.toString());
     }
 
+    public Location loadConfigFileForLobby(){
+        FileConfiguration config;
+        File file = new File(plugin.getDataFolder(), "config.yml");
+        config = YamlConfiguration.loadConfiguration(file);
+        if(file.exists())
+        {
+            return config.getLocation("Lobby");
+        }
+        return null;
+    }
+
     public void savePlayerFile(Player p, Golfer g){
         FileConfiguration config;
         File file = new File(playerFileLocation, p.getUniqueId() + ".yml");
         if(file.exists())
         {
             config = YamlConfiguration.loadConfiguration(file);
-            config.set("BallSkin", g.getBall().getBallSkin().getType());
-            config.set("ClubSkin", g.getClub().getClubSkin().getType());
+            config.set("BallSkin", g.getBall().getBallSkin().getType().toString());
+            config.set("ClubSkin", g.getClub().getClubSkin().getType().toString());
             try {
                 config.save(file);
             } catch (IOException e) {
@@ -128,15 +155,19 @@ public class FileUtils {
             Material csMat = Material.valueOf(config.getString("ClubSkin"));
             g = new Golfer(csMat, bsMat, c);
         }
+        else
+            createPlayerFile(p);
         return g;
     }
 
-    public Set<String> getCourseNames()
+    public List<String> getCourseNames()
     {
-        FileConfiguration config;
+        List<String> names = new LinkedList<>();
         File file = new File(courseFileLocation);
-        config = YamlConfiguration.loadConfiguration(file);
-        Set<String> names = config.getKeys(false);
+        File[] files = file.listFiles();
+        for(File f : files)
+            names.add(f.getName().replace(".yml", ""));
+
         return names;
     }
 
@@ -177,7 +208,7 @@ public class FileUtils {
             config = YamlConfiguration.loadConfiguration(file);
             c = new Course(config.getString("CourseName"));
 
-            for(String s : config.getStringList("holes"))
+            for(String s : config.getConfigurationSection("holes").getKeys(false))
             {
                 World w = Bukkit.getWorld(config.getString("holes." + s + ".w"));
                 double x = config.getDouble("holes." + s + ".x");

@@ -28,15 +28,17 @@ public final class Minigolf extends JavaPlugin {
         playerManager = new PlayerManager();
         courseManager = new CourseManager();
         registerEvents(this, new MinigolfListener());
-        getCommand("tpb").setExecutor(new TpBall());
+        getCommand("mgcard").setExecutor(new ScoreBoardCommand());
         getCommand("start").setExecutor(new StartGolfCommand());
         getCommand("party").setExecutor(new PartyCommand());
         getCommand("cc").setExecutor(new CreateCourseCommand());
+        getCommand("mgcosmetic").setExecutor(new CosmeticsCommand());
 
     }
 
     @Override
     public void onDisable() {
-        fUtils.saveConfigFile();
+        fUtils.saveConfigFileForGreens();
+        playerManager.cleanUpForDisable();
     }
 }

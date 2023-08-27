@@ -31,9 +31,11 @@ public class BallMovementEvent extends Event{
             float range = power;
             Vector d = dir.clone();
             Item pball = ball.getBall();
-               @Override
+
+            @Override
             public void run()
             {
+
                 if(range <= 0)
                 {
                     Minigolf.playerManager.getGolfer(p).setCanHit(true);
@@ -42,18 +44,19 @@ public class BallMovementEvent extends Event{
 
                 if(isInCauldron(ball.getLocation(), p))
                 {
-                    Bukkit.getServer().getPluginManager().callEvent(new HoleInEvent(p));
                     Minigolf.playerManager.getGolfer(p).setCanHit(true);
+                    Bukkit.getServer().getPluginManager().callEvent(new HoleInEvent(p));
                     this.cancel();
                 }
 
 
                 if(!Minigolf.courseManager.getGreens().contains(pball.getWorld().getBlockAt(pball.getLocation().subtract(0,1,0)).getType().toString()))
                 {
-                    pball.teleport(originPosition);
                     pball.setVelocity(new Vector(0,0,0));
+                    pball.teleport(originPosition);
                     Minigolf.playerManager.getGolfer(p).setCanHit(true);
                     this.cancel();
+                    return;
                 }
 
                 float speed = getBallSpeed(power, range);
@@ -84,7 +87,7 @@ public class BallMovementEvent extends Event{
     {
         Block b = p.getWorld().getBlockAt(loc.add(0,.25f,0));
 
-        return b.getType().equals(Material.CAULDRON);
+        return b.getType().equals(Material.CAULDRON) || b.getType().equals(Material.COMPOSTER);
     }
 
     private float getBallSpeed(float power, float remainingTravelPower)

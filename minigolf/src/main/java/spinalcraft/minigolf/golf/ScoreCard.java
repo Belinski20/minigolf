@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -45,38 +46,15 @@ public class ScoreCard implements Listener {
         ent.openInventory(scoreCard);
     }
 
-    private void createScoreCard(Party party)
+    public Inventory getScoreCard()
     {
-        scoreCard.clear();
-        int scorecardIndex = 1;
-        for(Hole c : Minigolf.playerManager.getGolfer(party.getPlayers().get(0)).getCourse().getHoles())
-        {
-            ItemStack course = createCourseNames(c);
-            scoreCard.setItem(scorecardIndex, course);
-            scorecardIndex++;
-        }
-
-        for(Player p : party.getPlayers())
-        {
-            Golfer g = Minigolf.playerManager.getGolfer(p);
-            ItemStack golferIcon = createGolferIcon(p, g);
-            scoreCard.setItem(scorecardIndex, golferIcon);
-            scorecardIndex++;
-
-
-            for(Hole c : g.getCourse().getHoles())
-            {
-                ItemStack golferCourseItem = createGolferCourseItems(c);
-                scoreCard.setItem(scorecardIndex, golferCourseItem);
-                scorecardIndex++;
-            }
-
-        }
+        return scoreCard;
     }
 
-    public void updateScoreCard(Party party)
+    public void createScoreCard(Party party)
     {
         int scorecardIndex = 1;
+        int playerScoreCardStartIndex = 9;
         for(Hole c : Minigolf.playerManager.getGolfer(party.getPlayers().get(0)).getCourse().getHoles())
         {
             ItemStack course = createCourseNames(c);
@@ -84,8 +62,10 @@ public class ScoreCard implements Listener {
             scorecardIndex++;
         }
 
+
         for(Player p : party.getPlayers())
         {
+            scorecardIndex = playerScoreCardStartIndex;
             Golfer g = Minigolf.playerManager.getGolfer(p);
             ItemStack golferIcon = createGolferIcon(p, g);
             scoreCard.setItem(scorecardIndex, golferIcon);
@@ -98,7 +78,7 @@ public class ScoreCard implements Listener {
                 scoreCard.setItem(scorecardIndex, golferCourseItem);
                 scorecardIndex++;
             }
-
+            scorecardIndex = playerScoreCardStartIndex+9;
         }
     }
 
@@ -131,7 +111,13 @@ public class ScoreCard implements Listener {
 
     private ItemStack createGolferCourseItems(Hole c)
     {
-        final ItemStack item = new ItemStack(Material.GRAY_CONCRETE, 1);
+        final ItemStack item;
+        if(c.getStrokes() < c.getPar())
+            item = new ItemStack(Material.GREEN_CONCRETE, 1);
+        else if (c.getStrokes() == c.getPar())
+            item = new ItemStack(Material.GRAY_CONCRETE, 1);
+        else
+            item = new ItemStack(Material.RED_CONCRETE, 1);
         final ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.text().content(c.getName()).build());
         List<Component> lore = new LinkedList<>();
@@ -166,5 +152,4 @@ public class ScoreCard implements Listener {
             e.setCancelled(true);
         }
     }
-
 }

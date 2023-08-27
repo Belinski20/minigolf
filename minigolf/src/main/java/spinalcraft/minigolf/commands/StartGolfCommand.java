@@ -1,18 +1,19 @@
 package spinalcraft.minigolf.commands;
 
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.title.Title;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Score;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spinalcraft.minigolf.Minigolf;
 import spinalcraft.minigolf.golf.Course;
-import spinalcraft.minigolf.golf.ScoreCard;
 import spinalcraft.minigolf.player.Golfer;
 import spinalcraft.minigolf.player.Party;
+import spinalcraft.minigolf.utils.Messages;
 
 import java.util.List;
 
@@ -40,22 +41,39 @@ public class StartGolfCommand implements TabExecutor {
             for(Player golfer : party.getPlayers())
             {
                 Minigolf.fUtils.createPlayerFile(golfer);
-                Golfer g = Minigolf.fUtils.loadPlayerFile(golfer, null);
-                //g.devCreateCourses();
+                Golfer g = Minigolf.fUtils.loadPlayerFile(golfer, course);
                 Minigolf.playerManager.addGolfer(golfer, g);
                 party.initliazeScoreCard();
-                party.teleportToNextHole();
-                //Jank Code
-                g.getBall().setOwner(g);
-                Item item = p.getWorld().dropItem(g.getCourse().getHoleByNumber(party.getCurrentCourse()).getLoc(), g.getBall().getBallSkin());
-                item.setCanPlayerPickup(false);
-                item.setUnlimitedLifetime(true);
-                g.getBall().setBall(item);
+                startCountDown(p, party);
             }
+
 
             return true;
         }
         return true;
+    }
+
+    public void startCountDown(Player player, Party party)
+    {
+        Audience audience = player;
+        String courseName = Minigolf.playerManager.getGolfer(player).getCourse().getName();
+        new BukkitRunnable()
+        {
+            int seconds = 5;
+            @Override
+            public void run()
+            {
+                if(seconds <= 0)
+                {
+                    party.teleportPlayerToFirstHole(player);
+                    audience.clearTitle();
+                    this.cancel();
+                }
+                Title title = Title.title(Messages.makeMessage("Starting Golf : " + courseName), Messages.makeMessage("Joining in " + seconds + " seconds"));
+                audience.showTitle(title);
+                seconds -= 1;
+            }
+        }.runTaskTimer(Minigolf.m, 0,20);
     }
 
     @Override

@@ -29,16 +29,12 @@ public class Hole {
 
     public void incrementStrokes()
     {
-        strokes += strokes;
+        strokes += 1;
     }
 
     public boolean hasStrokedOut()
     {
         return strokes > 14;
-    }
-    public void setStrokes(int strokes)
-    {
-        this.strokes = strokes;
     }
 
     public int getStrokes()

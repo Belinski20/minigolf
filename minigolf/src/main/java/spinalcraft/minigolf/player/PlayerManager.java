@@ -1,7 +1,9 @@
 package spinalcraft.minigolf.player;
 
 import org.bukkit.entity.Player;
+import spinalcraft.minigolf.Minigolf;
 import spinalcraft.minigolf.golf.ScoreCard;
+import spinalcraft.minigolf.utils.Messages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,18 +87,37 @@ public class PlayerManager {
         return null;
     }
 
+    public void disbandParty(Party p)
+    {
+        ArrayList<Player> pl = new ArrayList<>(p.getPlayers());
+        for(Player player : pl)
+        {
+            p.leaveParty(player);
+        }
+    }
+
     public void removeParty(Party p)
     {
         parties.remove(p);
     }
 
-    public void addPlayerToParty(Player p, Party party)
-    {
-        party.joinParty(p);
-    }
-
     public ScoreCard getScoreCardForPlayer(Player p)
     {
         return getPlayersParty(p).getScoreCard();
+    }
+
+    public void teleportToLobby(Player p)
+    {
+        p.teleport(Minigolf.fUtils.loadConfigFileForLobby());
+        p.sendMessage(Messages.makeMessage(Messages.TeleportBackToLobby));
+    }
+
+    public void cleanUpForDisable()
+    {
+        for(Map.Entry<Player, Golfer> entry : getGolfers().entrySet())
+        {
+            entry.getKey().getInventory().clear();
+            entry.getValue().cleanUp();
+        }
     }
 }

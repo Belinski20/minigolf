@@ -7,11 +7,11 @@ description: Minigolf
 depend: [Vault]
 
 commands:
-  tpb:
+  mgcard:
     permission-message: Do not have valid permissions to use
-    usage: equip items
-    description: Updates a specific players slip rank
-    permission: minigolf.tpb
+    usage: /mgcard
+    description: shows the players ScoreCard
+    permission: minigolf.mgcard
   start:
     permission-message: Do not have valid permissions to use
     usage: /start <Course Name>
@@ -24,6 +24,11 @@ commands:
     permission: minigolf.party
   cc:
     permission-message: Do not have valid permissions to use
-    usage: /cc
+    usage: /cc <new | edit | save | quit | green>
     description: Used to create and edit courses
     permission: minigolf.cc
+  mgcosmetic:
+    permission-message: Do not have valid permissions to use
+    usage: /mgcosmetic <ball | club> <Material>
+    description: Used to create and edit courses
+    permission: minigolf.cosmetics

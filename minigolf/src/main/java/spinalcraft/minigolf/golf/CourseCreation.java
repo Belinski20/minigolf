@@ -9,24 +9,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import spinalcraft.minigolf.Minigolf;
 import spinalcraft.minigolf.events.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CourseCreation implements Listener {
 
     private int size = 9;
     private String name;
-    private Map<String, Hole> holes;
+    private ArrayList<Hole> holes;
     private Inventory courseInv;
     private Inventory holeInv;
     private Hole currentHole;
@@ -35,7 +32,7 @@ public class CourseCreation implements Listener {
     public CourseCreation(String name)
     {
         this.name = name;
-        holes = new HashMap<>();
+        holes = new ArrayList<>();
         courseInv = Bukkit.createInventory(null, size, Component.text().content(name).build());
         createCourseInv();
         Bukkit.getServer().getPluginManager().registerEvents(this, Minigolf.m);
@@ -44,9 +41,8 @@ public class CourseCreation implements Listener {
     public CourseCreation(Course course)
     {
         this.name = course.getName();
-        holes = new HashMap<>();
-        for(Hole hole : course.getHoles())
-            holes.put(hole.getName(), hole);
+        holes = new ArrayList<>();
+        holes.addAll(course.getHoles());
         courseInv = Bukkit.createInventory(null, size, Component.text().content(name).build());
         createCourseInv();
         Bukkit.getServer().getPluginManager().registerEvents(this, Minigolf.m);
@@ -80,7 +76,10 @@ public class CourseCreation implements Listener {
             if(item.getType().equals(Material.LIME_CONCRETE))
                 continue;
             String name = PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName());
-            course.addHole(holes.get(getHole(name)));
+            Hole h = getHole(name);
+            if(h.getLoc() == null)
+                continue;
+            course.addHole(h);
         }
         Minigolf.courseManager.addCourse(name);
         Minigolf.fUtils.createCourseFile(course);
@@ -94,11 +93,16 @@ public class CourseCreation implements Listener {
         courseInv.clear();
         courseInv.setItem(0, makeCourseAddButton());
         int index = 1;
-        for(Hole h : holes.values())
+        for(Hole h : holes)
         {
             courseInv.setItem(index, makeHoleItem(h));
             index++;
         }
+    }
+
+    public void unregister()
+    {
+        HandlerList.unregisterAll(this);
     }
 
     private ItemStack makeCourseAddButton()
@@ -122,7 +126,7 @@ public class CourseCreation implements Listener {
 
     public void saveHole(Hole hole)
     {
-        holes.put(hole.getName(), hole);
+        holes.add(hole);
     }
 
     private void createHoleInv(Hole hole)
@@ -171,7 +175,10 @@ public class CourseCreation implements Listener {
 
     public Hole getHole(String name)
     {
-        return holes.get(name);
+        for(Hole hole : holes)
+            if(hole.getName().equals(name))
+                return hole;
+        return null;
     }
 
     // Check for clicks on items in course inventory
@@ -185,6 +192,38 @@ public class CourseCreation implements Listener {
             e.setCancelled(true);
             return;
         }
+
+        if(e.getClick() == ClickType.RIGHT)
+        {
+            ItemStack heldItem = e.getCursor();
+            ItemStack slotItem = e.getCurrentItem();
+
+            if(heldItem.getType() == Material.AIR)
+            {
+                if(slotItem.getType() == Material.MOSS_BLOCK)
+                {
+                    return;
+                }
+                e.setCancelled(true);
+                return;
+            }
+
+            if(heldItem.getType() == Material.MOSS_BLOCK)
+            {
+                if(slotItem == null)
+                    return;
+                if(slotItem.getType() == Material.MOSS_BLOCK || slotItem.getType() == Material.AIR)
+                {
+                    return;
+                }
+                e.setCancelled(true);
+                return;
+            }
+            e.setCancelled(true);
+            return;
+
+        }
+
 
         if(e.getInventory().equals(courseInv))
         {
@@ -263,8 +302,18 @@ public class CourseCreation implements Listener {
     // Cancel dragging in our inventory
     @EventHandler
     public void onInventoryClick(final InventoryDragEvent e) {
-        if (e.getInventory().equals(courseInv) || e.getInventory().equals(holeInv)) {
+        if (e.getInventory().equals(holeInv)) {
             e.setCancelled(true);
+        }
+
+        if(e.getInventory().equals(courseInv))
+        {
+            ItemStack item = e.getCursor();
+            if(item == null)
+                return;
+            if(!item.getType().equals(Material.MOSS_BLOCK))
+                e.setCancelled(true);
+
         }
     }
 }

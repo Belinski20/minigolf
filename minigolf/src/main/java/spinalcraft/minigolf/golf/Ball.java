@@ -47,6 +47,10 @@ public class Ball {
     {
         return ballSkin;
     }
+    public void setBallSkin(ItemStack ballSkin)
+    {
+        this.ballSkin = ballSkin;
+    }
 
     public void setPower(float power)
     {

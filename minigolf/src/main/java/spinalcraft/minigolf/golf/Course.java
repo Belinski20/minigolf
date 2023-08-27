@@ -1,7 +1,6 @@
 package spinalcraft.minigolf.golf;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 public class Course {
 
