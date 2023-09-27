@@ -14,12 +14,12 @@ commands:
     permission: minigolf.mgcard
   start:
     permission-message: Do not have valid permissions to use
-    usage: /start <Course Name>
+    usage: /start <Player Name> <Course Name>
     description: Starts minigolf for a specified course
     permission: minigolf.start
   party:
     permission-message: Do not have valid permissions to use
-    usage: /party
+    usage: /party <invite | list | accept | reject | leave>
     description: Makes a party for golf
     permission: minigolf.party
   cc:
@@ -29,6 +29,6 @@ commands:
     permission: minigolf.cc
   mgcosmetic:
     permission-message: Do not have valid permissions to use
-    usage: /mgcosmetic <ball | club> <Material>
-    description: Used to create and edit courses
+    usage: /mgcosmetic <Player Name> <ball | club> <Material>
+    description: Used to change club and ball skins
     permission: minigolf.cosmetics

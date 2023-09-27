@@ -13,6 +13,7 @@ public class HoleInEvent extends Event {
 
     private static final HandlerList HANDLERS = new HandlerList();
     private Player p;
+    private Golfer golfer;
     private Location location;
 
     public static HandlerList getHandlerList() {
@@ -23,10 +24,10 @@ public class HoleInEvent extends Event {
     {
         this.p = p;
         Golfer golfer = Minigolf.playerManager.getGolfer(p);
+        this.golfer = golfer;
         Party party = Minigolf.playerManager.getPlayersParty(p);
 
         party.getScoreCard().createScoreCard(party);
-        golfer.getCourse().getHoleByNumber(party.getCurrentCourse()).setComplete();
         location = golfer.getBall().getLocation().clone();
         golfer.getBall().getBall().remove();
         golfer.getBall().setBall(null);
@@ -40,6 +41,10 @@ public class HoleInEvent extends Event {
     public Player getPlayer()
     {
         return p;
+    }
+    public Golfer getGolfer()
+    {
+        return golfer;
     }
 
     @Override

@@ -20,7 +20,7 @@ public class ScoreBoardCommand implements TabExecutor {
         if(!Minigolf.playerManager.isPlayerGolfing(p))
             return true;
         Minigolf.playerManager.getPlayersParty(p).getScoreCard().createScoreCard(Minigolf.playerManager.getPlayersParty(p));
-        Minigolf.playerManager.getPlayersParty(p).forceOpenScorecard();
+        Minigolf.playerManager.getPlayersParty(p).forceOpenScorecard(p);
         return true;
     }
 

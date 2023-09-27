@@ -1,5 +1,7 @@
 package spinalcraft.minigolf.golf;
 
+import org.bukkit.Location;
+
 import java.util.ArrayList;
 
 public class Course {
@@ -11,6 +13,12 @@ public class Course {
     {
         this.name = name;
         holes = new ArrayList<>();
+    }
+
+    public Course(String name, ArrayList<Hole> holes)
+    {
+        this.name = name;
+        this.holes = holes;
     }
 
     public Hole getHoleByNumber(int i)

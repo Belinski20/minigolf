@@ -14,18 +14,21 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import spinalcraft.minigolf.golf.CourseCreation;
 import spinalcraft.minigolf.golf.EndGameScoreCard;
 import spinalcraft.minigolf.golf.Hole;
 import spinalcraft.minigolf.Minigolf;
-import spinalcraft.minigolf.golf.ScoreCard;
 import spinalcraft.minigolf.player.Golfer;
 import spinalcraft.minigolf.player.Party;
 
+import java.util.ArrayList;
+
 public class MinigolfListener implements Listener {
+
+    private Sound ballHitSound = Sound.UI_BUTTON_CLICK;
+    private Sound holeInSound = Sound.BLOCK_AMETHYST_BLOCK_RESONATE;
 
     @EventHandler
     public void playerPrepBall(PlayerInteractEvent event) {
@@ -47,6 +50,13 @@ public class MinigolfListener implements Listener {
             {
                 golfer.setIsCharging(true);
                 Bukkit.getServer().getPluginManager().callEvent(new AimEvent(event.getPlayer()));
+                return;
+            }
+            if(golfer.getIsCharging() && golfer.canHit())
+            {
+                golfer.setIsCharging(false);
+                Bukkit.getServer().getPluginManager().callEvent(new AimEvent(event.getPlayer()));
+                return;
             }
         }
 
@@ -59,7 +69,7 @@ public class MinigolfListener implements Listener {
                 int currentCourse = Minigolf.playerManager.getScoreCardForPlayer(event.getPlayer()).getParty().getCurrentCourse();
                 golfer.getCourse().getHoleByNumber(currentCourse).incrementStrokes();
                 Minigolf.playerManager.getPlayersParty(event.getPlayer()).getScoreCard().createScoreCard(Minigolf.playerManager.getPlayersParty(event.getPlayer()));
-                event.getPlayer().getWorld().playSound(golfer.getBall().getBall(), Sound.BLOCK_GLASS_HIT, 1f, 1);
+                event.getPlayer().getWorld().playSound(golfer.getBall().getBall(), ballHitSound, 3f, 2);
                 Bukkit.getServer().getPluginManager().callEvent(new BallMovementEvent(event.getPlayer(), ((float)(golfer.getBall().getPower() + 0.1) * 100)));
             }
         }
@@ -69,25 +79,27 @@ public class MinigolfListener implements Listener {
     public void ballInHole(HoleInEvent event)
     {
         Player p = event.getPlayer();
-        p.getWorld().playSound(event.getLocation(), Sound.BLOCK_AMETHYST_BLOCK_RESONATE, 10f, 1);
+        Golfer golfer = event.getGolfer();
         Party party = Minigolf.playerManager.getPlayersParty(p);
-        Golfer golfer = Minigolf.playerManager.getGolfer(p);
+        ArrayList<Player> players = new ArrayList<>();
+        for(Player pl : party.getPlayers())
+            players.add(pl);
+        golfer.getCourse().getHoleByNumber(party.getCurrentCourse()).setComplete();
+        p.getWorld().playSound(event.getLocation(), holeInSound, 10f, 1);
+
         if(party.isDoneWithHole())
         {
             if(party.isCourseDone(golfer))
             {
-
                 EndGameScoreCard card = new EndGameScoreCard(party.getScoreCard().getScoreCard());
                 Minigolf.playerManager.disbandParty(party);
-                card.open(p);
+                for(Player pl : players)
+                    card.open(pl);
                 return;
             }
             party.incrementHole();
             party.teleportToNextHole();
         }
-
-
-
     }
 
     @EventHandler

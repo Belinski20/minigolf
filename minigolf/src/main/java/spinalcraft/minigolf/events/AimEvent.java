@@ -37,7 +37,6 @@ public class AimEvent extends Event implements Cancellable {
             @Override
             public void run()
             {
-
                 if(isCancelled)
                     this.cancel();
 

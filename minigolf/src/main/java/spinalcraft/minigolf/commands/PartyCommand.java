@@ -54,6 +54,13 @@ public class PartyCommand implements TabExecutor {
                     p.sendMessage(Messages.makeMessage(Messages.PartyInviteNoPlayerArg));
                     return true;
                 }
+
+                if(Minigolf.playerManager.getPlayersParty(p) == null)
+                {
+                    Minigolf.playerManager.createParty(p);
+                    p.sendMessage(Messages.makeMessage(Messages.PartyCreate));
+                }
+
                 Player invitee = Bukkit.getServer().getPlayer(args[1]);
                 if(invitee == null || !invitee.isOnline())
                 {
@@ -68,6 +75,9 @@ public class PartyCommand implements TabExecutor {
             case "accept":
                 accept(p);
                 break;
+            case "list":
+                list(p);
+                break;
             case "reject":
                 reject(p);
                 break;
@@ -79,7 +89,7 @@ public class PartyCommand implements TabExecutor {
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(args.length == 1)
-            return Arrays.asList("invite", "leave", "accept", "reject");
+            return Arrays.asList("invite", "leave", "accept", "reject", "list");
         return null;
     }
 
@@ -92,7 +102,7 @@ public class PartyCommand implements TabExecutor {
 
         }
 
-        if(Minigolf.playerManager.getPlayersParty(sender) != null)
+        if(Minigolf.playerManager.getPlayersParty(sender) == null)
         {
             sender.sendMessage(Messages.makeMessage(Messages.PartyInviteNotInParty));
             return false;
@@ -130,8 +140,17 @@ public class PartyCommand implements TabExecutor {
             @Override
             public void run()
             {
+                if(Minigolf.playerManager.getPlayersParty(invitee) != null)
+                    this.cancel();
+
             if(seconds >= maxTime)
             {
+                if(Minigolf.playerManager.getPlayersParty(invitee) != null)
+                    this.cancel();
+
+                Party p = Minigolf.playerManager.getPlayersParty(sender);
+                for(Player player : p.getPlayers())
+                    player.sendMessage(Messages.PartyInviteTimeoutToParty.replace("PLAYER", invitee.getName()));
                 invitee.sendMessage(Messages.makeMessage(Messages.PartyInviteTimeout));
                 Minigolf.playerManager.removeInvite(invitee);
                 this.cancel();
@@ -148,6 +167,9 @@ public class PartyCommand implements TabExecutor {
     {
         if(Minigolf.playerManager.hasInvite(p))
         {
+            Party party = Minigolf.playerManager.getPendingPartyInvite(p);
+            for(Player player : party.getPlayers())
+                player.sendMessage(Messages.PartyRejectTOParty);
             p.sendMessage(Messages.makeMessage(Messages.PartyReject));
             Minigolf.playerManager.removeInvite(p);
             return;
@@ -187,5 +209,16 @@ public class PartyCommand implements TabExecutor {
         }
         player.sendMessage(Messages.makeMessage(Messages.PartyInviteFullParty));
         return false;
+    }
+
+    public void list(Player p)
+    {
+        String message = "Golf party members :";
+        Party party = Minigolf.playerManager.getPlayersParty(p);
+        for(Player pl : party.getPlayers())
+            message += " " + pl.getName() + ",";
+        message = message.substring(0, message.length() - 1);
+
+        p.sendMessage(Messages.makeMessage(message));
     }
 }

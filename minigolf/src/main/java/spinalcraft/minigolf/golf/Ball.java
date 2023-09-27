@@ -8,19 +8,31 @@ import spinalcraft.minigolf.player.Golfer;
 
 public class Ball {
 
-    private ItemStack ballSkin;
+    private ItemStack skin;
     private Item ball;
+    private Location lastInteractiveUsed;
     private Golfer owner;
     private float power;
+    private Location origin;
 
     public Ball(Material ballSkin)
     {
-        this.ballSkin = new ItemStack(ballSkin);
+        this.skin = new ItemStack(ballSkin);
     }
 
     public void setOwner(Golfer owner)
     {
         this.owner = owner;
+    }
+
+    public Location getLastInteractiveUsed()
+    {
+        return lastInteractiveUsed;
+    }
+
+    public void setLastInteractiveUsed(Location loc)
+    {
+        this.lastInteractiveUsed = loc;
     }
 
     public Golfer getOwner()
@@ -31,6 +43,14 @@ public class Ball {
     public Location getLocation()
     {
         return ball.getLocation();
+    }
+    public Location getOriginLocation()
+    {
+        return origin;
+    }
+    public void setOrigin(Location origin)
+    {
+        this.origin = origin;
     }
 
     public Item getBall()
@@ -43,13 +63,13 @@ public class Ball {
         this.ball = ball;
     }
 
-    public ItemStack getBallSkin()
+    public ItemStack getSkin()
     {
-        return ballSkin;
+        return skin;
     }
-    public void setBallSkin(ItemStack ballSkin)
+    public void setSkin(ItemStack skin)
     {
-        this.ballSkin = ballSkin;
+        this.skin = skin;
     }
 
     public void setPower(float power)

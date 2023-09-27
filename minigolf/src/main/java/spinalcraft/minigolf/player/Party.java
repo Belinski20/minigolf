@@ -3,7 +3,10 @@ package spinalcraft.minigolf.player;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import spinalcraft.minigolf.Minigolf;
+import spinalcraft.minigolf.golf.Course;
+import spinalcraft.minigolf.golf.Hole;
 import spinalcraft.minigolf.golf.ScoreCard;
+import spinalcraft.minigolf.utils.Messages;
 
 import java.util.ArrayList;
 
@@ -62,21 +65,19 @@ public class Party {
         scoreCard = new ScoreCard(this);
     }
 
-    public void forceOpenScorecard()
+    public void forceOpenScorecard(Player p)
     {
-        for(Player p : players)
-            scoreCard.openGUI(p);
+        scoreCard.openGUI(p);
     }
 
     public boolean isDoneWithHole()
     {
-        boolean isDoneWithHole = true;
         for(Player p : players)
         {
             if(!Minigolf.playerManager.getGolfer(p).getCourse().getHoleByNumber(getCurrentCourse()).isComplete())
-                isDoneWithHole = false;
+                return false;
         }
-        return isDoneWithHole;
+        return true;
     }
 
     public void incrementHole()
@@ -88,7 +89,9 @@ public class Party {
     {
         for(Player p : players)
         {
-            p.teleport(Minigolf.playerManager.getGolfer(p).getCourse().getHoleByNumber(getCurrentCourse()).getLoc());
+            Hole hole = Minigolf.playerManager.getGolfer(p).getCourse().getHoleByNumber(getCurrentCourse());
+            p.teleport(hole.getLoc());
+            p.sendActionBar(Messages.makeMessage(Messages.NextHoleInfo.replace("HOLE", hole.getName()).replace("AMOUNT", Integer.toString(hole.getPar()))));
             Minigolf.playerManager.getGolfer(p).placeBall(this, getCurrentCourse());
         }
     }

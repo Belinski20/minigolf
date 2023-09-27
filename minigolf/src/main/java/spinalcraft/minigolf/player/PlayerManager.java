@@ -54,6 +54,16 @@ public class PlayerManager {
         return players.get(p);
     }
 
+    public Player getPlayerFromGolfer(Golfer g)
+    {
+        for(Map.Entry<Player, Golfer> entry : getGolfers().entrySet())
+        {
+            if(entry.getValue().equals(g))
+                return entry.getKey();
+        }
+        return null;
+    }
+
     public boolean isPlayerGolfing(Player p)
     {
         return players.containsKey(p);
@@ -61,7 +71,8 @@ public class PlayerManager {
 
     public void removeGolfer(Player p)
     {
-        getGolfer(p).cleanUp();
+        if(getGolfer(p) != null)
+            getGolfer(p).cleanUp();
         players.remove(p);
     }
 

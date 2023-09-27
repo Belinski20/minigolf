@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
 import spinalcraft.minigolf.golf.Ball;
 import spinalcraft.minigolf.golf.Club;
@@ -24,6 +25,17 @@ public class Golfer {
         this.course = course;
         isCharging = false;
         canHit = true;
+    }
+
+    public void setCustomModels(int ballModel, int clubModel)
+    {
+        ItemMeta bMeta = ball.getSkin().getItemMeta();
+        bMeta.setCustomModelData(ballModel);
+        ball.getSkin().setItemMeta(bMeta);
+
+        ItemMeta cMeta = club.getClubSkin().getItemMeta();
+        cMeta.setCustomModelData(clubModel);
+        club.getClubSkin().setItemMeta(cMeta);
     }
 
     public Club getClub()
@@ -83,7 +95,8 @@ public class Golfer {
     public void placeBall(Party p, int currentCourse)
     {
         ball.setOwner(this);
-        Item b = p.getWorld().dropItem(getCourse().getHoleByNumber(currentCourse).getLoc().add(0.5, 0.5, 0.5), ball.getBallSkin());
+        Location loc = getCourse().getHoleByNumber(currentCourse).getLoc().clone();
+        Item b = p.getWorld().dropItem(loc.add(0.5, 0.5, 0.5), ball.getSkin());
         b.setVelocity(new Vector(0,0,0));
         b.setCanPlayerPickup(false);
         b.setUnlimitedLifetime(true);

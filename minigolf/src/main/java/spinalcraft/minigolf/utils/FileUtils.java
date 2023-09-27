@@ -134,8 +134,10 @@ public class FileUtils {
         if(file.exists())
         {
             config = YamlConfiguration.loadConfiguration(file);
-            config.set("BallSkin", g.getBall().getBallSkin().getType().toString());
+            config.set("BallSkin", g.getBall().getSkin().getType().toString());
+            config.set("BallModelID", g.getBall().getSkin().getItemMeta().getCustomModelData());
             config.set("ClubSkin", g.getClub().getClubSkin().getType().toString());
+            config.set("ClubModelID", g.getClub().getClubSkin().getItemMeta().getCustomModelData());
             try {
                 config.save(file);
             } catch (IOException e) {
@@ -152,8 +154,11 @@ public class FileUtils {
         {
             config = YamlConfiguration.loadConfiguration(file);
             Material bsMat = Material.valueOf(config.getString("BallSkin"));
+            int bModel = config.getInt("BallModelID");
             Material csMat = Material.valueOf(config.getString("ClubSkin"));
+            int cModel = config.getInt("ClubModelID");
             g = new Golfer(csMat, bsMat, c);
+            g.setCustomModels(bModel, cModel);
         }
         else
             createPlayerFile(p);

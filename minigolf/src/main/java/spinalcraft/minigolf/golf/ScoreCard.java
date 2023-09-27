@@ -62,10 +62,10 @@ public class ScoreCard implements Listener {
             scorecardIndex++;
         }
 
-
+        scorecardIndex = playerScoreCardStartIndex;
         for(Player p : party.getPlayers())
         {
-            scorecardIndex = playerScoreCardStartIndex;
+
             Golfer g = Minigolf.playerManager.getGolfer(p);
             ItemStack golferIcon = createGolferIcon(p, g);
             scoreCard.setItem(scorecardIndex, golferIcon);
@@ -78,7 +78,8 @@ public class ScoreCard implements Listener {
                 scoreCard.setItem(scorecardIndex, golferCourseItem);
                 scorecardIndex++;
             }
-            scorecardIndex = playerScoreCardStartIndex+9;
+            playerScoreCardStartIndex += 9;
+            scorecardIndex = playerScoreCardStartIndex;
         }
     }
 

@@ -12,8 +12,9 @@ import spinalcraft.minigolf.golf.CourseCreation;
 import spinalcraft.minigolf.utils.Messages;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CreateCourseCommand implements TabExecutor {
     @Override
@@ -51,7 +52,8 @@ public class CreateCourseCommand implements TabExecutor {
         {
             if(Minigolf.courseManager.saveCourse(p))
             {
-                Minigolf.courseManager.getCourseCreation(p).unregister();
+
+                //Minigolf.courseManager.getCourseCreation(p).unregister();
                 p.sendMessage(Messages.makeMessage(Messages.CCCourseSaved));
                 return true;
             }
@@ -63,7 +65,7 @@ public class CreateCourseCommand implements TabExecutor {
         {
             if(Minigolf.courseManager.editCourse(p, args[1]))
             {
-                //course exists
+                Minigolf.courseManager.getCourseCreation(p).openCourseInv(p);
                 return true;
             }
             p.sendMessage(Messages.makeMessage(Messages.CCCourseNotExist.replace("COURSE", args[1])));
@@ -74,7 +76,7 @@ public class CreateCourseCommand implements TabExecutor {
         {
             if(Minigolf.courseManager.removeCourseInCreation(p))
             {
-                Minigolf.courseManager.getCourseCreation(p).unregister();
+                //Minigolf.courseManager.getCourseCreation(p).unregister();
                 return true;
             }
             p.sendMessage(Messages.makeMessage(Messages.CCNoCoursePending));
@@ -104,11 +106,11 @@ public class CreateCourseCommand implements TabExecutor {
 
             if(args[1].equals("add"))
             {
-                if(Material.getMaterial(args[2]) != null)
+                if(Material.getMaterial(args[2].toUpperCase()) != null)
                 {
-                    if(!Minigolf.courseManager.getGreens().contains(args[2]))
+                    if(!Minigolf.courseManager.getGreens().contains(args[2].toUpperCase()))
                     {
-                        Minigolf.courseManager.addGreen(args[2]);
+                        Minigolf.courseManager.addGreen(args[2].toUpperCase());
                         // added new green
                         p.sendMessage(Messages.makeMessage(Messages.CCGreenAdded.replace("MATERIAL", args[2])));
                         return true;
@@ -123,11 +125,11 @@ public class CreateCourseCommand implements TabExecutor {
             }
             if(args[1].equals("remove"))
             {
-                if(Material.getMaterial(args[2]) != null)
+                if(Material.getMaterial(args[2].toUpperCase()) != null)
                 {
-                    if(Minigolf.courseManager.getGreens().contains(args[2]))
+                    if(Minigolf.courseManager.getGreens().contains(args[2].toUpperCase()))
                     {
-                        Minigolf.courseManager.removeGreen(args[2]);
+                        Minigolf.courseManager.removeGreen(args[2].toUpperCase());
                         // removed a green
                         p.sendMessage(Messages.makeMessage(Messages.CCGreenRemove.replace("MATERIAL", args[2])));
                         return true;
@@ -161,13 +163,7 @@ public class CreateCourseCommand implements TabExecutor {
         {
             if(args[1].equals("add"))
             {
-                List<String> mats = new LinkedList<>();
-                for(Material mat : Material.values())
-                {
-                    if(!Minigolf.courseManager.getGreens().contains(mat.name()))
-                        mats.add(mat.name());
-                }
-                return mats;
+                return Stream.of(Material.values()).map(Material::name).filter(material -> material.startsWith(args[2].toUpperCase())).collect(Collectors.toList());
             }
             if(args[1].equals("remove"))
             {
